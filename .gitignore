@@ -1,0 +1,8 @@
+*.userprefs
+*.pidb
+*.dll
+*.pdb
+*.mdb
+*.exe
+bin
+test-results

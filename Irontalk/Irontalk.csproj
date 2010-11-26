@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{110405A0-3A46-4365-954F-C1813ACB0765}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Irontalk</RootNamespace>
+    <AssemblyName>SmalltalkParser</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="grammatica-1.5, Version=1.5.0.34677, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>grammatica-1.5.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Parser\SmalltalkAnalyzer.cs" />
+    <Compile Include="Parser\SmalltalkConstants.cs" />
+    <Compile Include="Parser\SmalltalkParser.cs" />
+    <Compile Include="Parser\SmalltalkTokenizer.cs" />
+    <Compile Include="SingletonFactory.cs" />
+    <Compile Include="Runtime\Classes\STClass.cs" />
+    <Compile Include="Runtime\Classes\STClassDescription.cs" />
+    <Compile Include="Runtime\Classes\STMetaclass.cs" />
+    <Compile Include="Runtime\Methods\STCompiledMethod.cs" />
+    <Compile Include="Runtime\Methods\STNativeMethod.cs" />
+    <Compile Include="Runtime\Methods\STRuntimeMethod.cs" />
+    <Compile Include="Runtime\Methods\STRuntimeMethodAttribute.cs" />
+    <Compile Include="Runtime\STObject.cs" />
+    <Compile Include="Runtime\STInstance.cs" />
+    <Compile Include="Runtime\STMessage.cs" />
+    <Compile Include="Runtime\STRuntimeObject.cs" />
+    <Compile Include="Runtime\Context\Context.cs" />
+    <Compile Include="Runtime\Context\GlobalContext.cs" />
+    <Compile Include="Runtime\Context\LocalContext.cs" />
+    <Compile Include="Runtime\BCL\Smalltalk.cs" />
+    <Compile Include="Runtime\STDebug.cs" />
+    <Compile Include="Compiler.cs" />
+    <Compile Include="Runtime\MessageNotUnderstood.cs" />
+    <Compile Include="Runtime\BCL\STBooleanDelegate.cs" />
+    <Compile Include="Runtime\STRuntimeClassDelegateAttribute.cs" />
+    <Compile Include="Runtime\BCL\STInt64Delegate.cs" />
+    <Compile Include="Runtime\BCL\STObjectDelegate.cs" />
+    <Compile Include="NSPrototype.cs" />
+    <Compile Include="Runtime\BCL\STUndefinedObject.cs" />
+    <Compile Include="Runtime\BCL\STNamespace.cs" />
+    <Compile Include="Runtime\BCL\STSymbol.cs" />
+    <Compile Include="Runtime\Methods\STBlock.cs" />
+    <Compile Include="Runtime\Methods\IBlockVisitor.cs" />
+    <Compile Include="Runtime\BCL\Array.cs" />
+    <Compile Include="Runtime\BCL\Transcript.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Smalltalk.grammar" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Runtime\" />
+    <Folder Include="Runtime\Classes\" />
+    <Folder Include="Runtime\Methods\" />
+    <Folder Include="Runtime\Context\" />
+    <Folder Include="Runtime\BCL\" />
+  </ItemGroup>
+</Project>
