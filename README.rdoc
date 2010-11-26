@@ -1,0 +1,21 @@
+= Irontalk -- A pragmatic Smalltalk implementation on top of the Common Language Runtime.
+
+Irontalk is an attempt to create a complete implementation of the Smalltalk programming language for the Common Language Runtime (AKA the .NET Framework).
+
+== Usage
+
+Currently Irontalk is in a testing stage. A simple command-line tool is included to evaluate Smalltalk expressions using the Irontalk engine. Though Irontalk
+is intended to become a full Smalltalk interpreter, compiler, and runtime, only the interpreter and runtime facilities are currently in place.
+
+== Developers
+
+Irontalk is being developed using Monodevelop 2.4, Mono 2.6, and NUnit, but the development infrastructure should work equally as well using Visual Studio 
+and Microsoft .NET. We invite all interested developers to check out the repository and load it up in the IDE of their choice. The build infrastructure is 
+MSBuild/XBuild and I have no intention of changing that, so please don't ask to change to Makefiles or CMake or NAnt or any such nonsense, as the proper 
+open source tools are (and have been) available to compile the code without requiring Visual Studio.
+
+== Meta
+
+© 2010 William Lahti. This software is licensed under the terms of the GNU General Public License. As a special exception, Smalltalk programs developed and/or
+executed with this implementation are exempt from the GPL's linking restrictions (meaning they need not be licensed under the GPL or a compatible license), 
+provided said programs do not access the library interface provided for the Irontalk compiler/interpreter (Irontalk.Compiler and related classes).
