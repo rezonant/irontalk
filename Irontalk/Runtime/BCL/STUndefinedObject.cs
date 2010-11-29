@@ -16,7 +16,7 @@ public class STUndefinedObject : STRuntimeObject {
 		[STRuntimeMethod("isNil")]
 		public override bool IsNil() { return true; }
 		
-		[STRuntimeMethod("toString")]
+		[STRuntimeMethod("asString")]
 		public override string ToString ()
 		{
 			return "nil";

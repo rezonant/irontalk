@@ -8,7 +8,7 @@
     <ProjectGuid>{C9CA730D-4587-4D8F-8DD3-B2AA74C3F9D6}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Test</RootNamespace>
-    <AssemblyName>Test</AssemblyName>
+    <AssemblyName>Irontalk.Console</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

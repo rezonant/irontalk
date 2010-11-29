@@ -1,3 +1,34 @@
+// 
+//  Author:
+//       William Lahti <wilahti@gmail.com>
+// 
+//  Copyright © 2010 William Lahti
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  As a special exception, the copyright holders of this library give
+//  you permission to link this library with independent modules to
+//  produce an executable, regardless of the license terms of these 
+//  independent modules, and to copy and distribute the resulting 
+//  executable under terms of your choice, provided that you also meet,
+//  for each linked independent module, the terms and conditions of the
+//  license of that module. An independent module is a module which is
+//  not derived from or based on this library. If you modify this library, you
+//  may extend this exception to your version of the library, but you are
+//  not obligated to do so. If you do not wish to do so, delete this
+//  exception statement from your version. 
+// 
+//  This program is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 using System;
 using System.IO;
@@ -5,10 +36,56 @@ using System.Collections.Generic;
 using PerCederberg.Grammatica.Runtime;
 using System.Reflection;
 using System.Text;
-namespace Irontalk
-{
+
+namespace Irontalk {
+	public interface IParseTreeVisitor {
+		void VisitSequence(Node sequence);
+		void VisitVariableDefinition (Node vardef);
+		void VisitStatement (Node statement);
+		void VisitExpression (Node expression);
+		void VisitReceiver (Node receiver);
+		void VisitMessage (Node message);
+		void VisitUnarySend (Node unarySend);
+		void VisitBinarySend (Node binarySend);
+		void VisitKeywordSend (Node keywordSend);
+	}
+	
+	public abstract class ParseTreeVisitor {
+		public virtual void VisitVariableDefinition (Node vardef) {}
+		public virtual void VisitStatement (Node statement) {}
+		public virtual void VisitExpression (Node expression) {}
+		public virtual void VisitReceiver (Node receiver) {}
+		public virtual void VisitMessage (Node message) {}
+		public virtual void VisitUnarySend (Node unarySend) {}
+		public virtual void VisitBinarySend (Node binarySend) {}
+		public virtual void VisitKeywordSend (Node keywordSend) {}
+	}
+	
+	public static class ParseTreeVisiting {
+		public static void Visit (this Node node, IParseTreeVisitor visitor)
+		{
+			int i = 0;
+			switch (node.Name) {
+				case "sequence": 
+					visitor.VisitSequence(node); 
+					if (node[i].Name == "var_def") {
+						visitor.VisitSequence(node);
+						++i;
+					}
+				
+					for (int max = node.Count; i < max; ++i)
+						node[i].Visit(visitor);
+				break;
+				case "var_def": 
+					visitor.VisitVariableDefinition(node); 
+				break;
+			}
+		}
+	}
+	
 	/// <summary>
-	/// 
+	/// Implements the interpreter (immediate) mode of Irontalk, which also acts as the compiler (since compiling is 
+	/// just message passing done at compile time).
 	/// </summary>
 	public class Compiler {
 		/// <summary>
@@ -18,7 +95,8 @@ namespace Irontalk
 		public Compiler (Assembly assembly)
 		{
 			Assembly = assembly;
-			Smalltalk.Initialize();
+			Parser = new IrontalkParser(new StringReader(""));
+			SmalltalkImage.Initialize();
 		}
 		
 		public Compiler():
@@ -27,6 +105,8 @@ namespace Irontalk
 		}
 		
 		Assembly Assembly { get; set; }
+		IrontalkParser Parser { get; set; }
+		
 		public STObject GetNumberLiteral (Token literal)
 		{
 			if (literal.Image.Contains("."))
@@ -37,7 +117,7 @@ namespace Irontalk
 		
 		public STObject GetStringLiteral (Token literal)
 		{
-			return STInstance.For(literal.Image.Substring(1, literal.Image.Length - 2));
+			return STInstance.For(literal.Image.Substring(1, literal.Image.Length - 2).Replace("''", "'"));
 		}
 		
 		public STObject GetCharLiteral (Token literal)
@@ -47,8 +127,11 @@ namespace Irontalk
 		
 		public STObject GetSymbolLiteral (Node literal)
 		{
-			// symbol_literal = '#' ( BINARY | SELECTOR ) ;
-			return STSymbol.Get((literal.GetChildAt(1) as Token).Image);
+			// symbol = '#' ( IDENT | BINARY | KEYWORD+ ) ;
+			var sb = new StringBuilder();
+			for (int i = 1, max = literal.Count; i < max; ++i)
+				sb.Append((literal[i] as Token).Image);
+			return STSymbol.Get(sb.ToString());
 		}
 		
 		public STObject GetArrayLiteral(Node literal, Context context)
@@ -65,8 +148,8 @@ namespace Irontalk
 		 
 		public STObject GetWordArrayLiteral(Node literal)
 		{
-			// word_array_literal = '#' '(' 
-			//	 ( IDENT | STRING | NUM_LITERAL | CHAR_LITERAL | '#' ( IDENT | word_array_literal ) ) 
+			// word_array = '#' '(' 
+			//	 ( IDENT | STRING | NUM | CHAR | '#' ( IDENT | word_array ) ) 
 			// ')' ;	
 			
 			List<object> values = new List<object>();
@@ -77,15 +160,15 @@ namespace Irontalk
 					values.Add (STSymbol.Get((child as Token).Image));
 				else if (child.Name == "STRING")
 					values.Add (GetStringLiteral(child as Token));
-				else if (child.Name == "NUM_LITERAL")
+				else if (child.Name == "NUM")
 					values.Add (GetNumberLiteral(child as Token));
-				else if (child.Name == "CHAR_LITERAL")
+				else if (child.Name == "CHAR")
 					values.Add (GetCharLiteral(child as Token));
 				else if (child.Name == "HASH") {
 					child = literal.GetChildAt(++i);
 					if (child.Name == "IDENT")
 						values.Add (STSymbol.Get((child as Token).Image));
-					else if (child.Name == "word_array_literal")
+					else if (child.Name == "word_array")
 						values.Add (GetWordArrayLiteral(child));
 					else
 						throw new Exception ("Unhandled path in grammar");
@@ -102,21 +185,21 @@ namespace Irontalk
 			if (child.Name == "IDENT") {
 				return new STVariable((receiver[0] as Token).Image, context);
 				//return context.GetVariable((receiver.GetChildAt(0) as Token).Image);
-			} else if (child.Name == "NUM_LITERAL") {
+			} else if (child.Name == "NUM") {
 				return GetNumberLiteral(child as Token);
-			} else if (child.Name == "CHAR_LITERAL") {
+			} else if (child.Name == "CHAR") {
 				return GetCharLiteral(child as Token);
-			} else if (child.Name == "symbol_literal") {
+			} else if (child.Name == "symbol") {
 				return GetSymbolLiteral(child);
 			} else if (child.Name == "STRING") {
 				return GetStringLiteral(child as Token);
-			} else if (child.Name == "word_array_literal") {
+			} else if (child.Name == "word_array") {
 				return GetWordArrayLiteral(child);
 			} else if (child.Name == "LEFT_PAREN") {
 				return EvaluateExpression(receiver.GetChildAt(1), context);
-			} else if (child.Name == "block_literal") {
+			} else if (child.Name == "block") {
 				return new STBlock (child, context, this);
-			} else if (child.Name == "array_literal") {
+			} else if (child.Name == "array") {
 				return GetArrayLiteral(child, context);
 			}
 			
@@ -181,7 +264,7 @@ namespace Irontalk
 					}
 					
 					keyword = (item as Token).Image;
-					parm = EvaluateReceiver(keywordSend.GetChildAt(++i), context);
+					parm = EvaluateReceiver(keywordSend.GetChildAt(++i), context).Dereference();
 				} else if (item.Name == "simple_send") {
 					parm = EvaluateSimpleSend(parm, item, context);
 				}
@@ -256,14 +339,25 @@ namespace Irontalk
 			if (str == string.Empty)
 				return STUndefinedObject.Instance;
 			
-			var tr = new StringReader (str);
-			var parser = new SmalltalkParser(tr);
-			var node = parser.Parse();
+			Parser.Reset(new StringReader (str + " \n."));
+			Node root;
 			
-			if (STDebug.ParseTree)
-				node.PrintTo(Console.Out);
+			try {
+				root = Parser.Parse();
+			} catch (ParserLogException e) {
+				var error = e.GetError(0);
+				throw new ParseException(new InputSource("input", null), error.Line, error.Message);
+			}
 			
-			return Evaluate (node, context);
+			if (STDebug.ShowParseTrees) {
+				var tr = Transcript.Instance;
+				if (tr != null)
+					root.PrintTo(tr.Out);
+				else
+					root.PrintTo(Console.Out);
+			}
+			
+			return Evaluate (root, context);
 		}
 	}
 }

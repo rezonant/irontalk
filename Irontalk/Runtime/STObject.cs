@@ -1,3 +1,34 @@
+// 
+//  Author:
+//       William Lahti <wilahti@gmail.com>
+// 
+//  Copyright © 2010 William Lahti
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  As a special exception, the copyright holders of this library give
+//  you permission to link this library with independent modules to
+//  produce an executable, regardless of the license terms of these 
+//  independent modules, and to copy and distribute the resulting 
+//  executable under terms of your choice, provided that you also meet,
+//  for each linked independent module, the terms and conditions of the
+//  license of that module. An independent module is a module which is
+//  not derived from or based on this library. If you modify this library, you
+//  may extend this exception to your version of the library, but you are
+//  not obligated to do so. If you do not wish to do so, delete this
+//  exception statement from your version. 
+// 
+//  This program is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 using System;
 using System.IO;
@@ -6,33 +37,23 @@ using PerCederberg.Grammatica.Runtime;
 using System.Reflection;
 namespace Irontalk
 {
-	public class STVariable: STObject {
-		public STVariable(string name, Context context)
-		{
-			Name = name;
-			Context = context;
-		}
-		
-		public string Name;
-		public Context Context;
-		
-		public override STObject Dereference ()
-		{
-			return Context.GetVariable(Name);
-		}
-		
-		public void Set(STObject value)
-		{
-			Context.SetVariable(Name, value);	
-		}
-		
-		public override string ToString ()
-		{
-			return "variable #" + Name;
-		}
-	}
-	
+	/// <summary>
+	/// The base class of all Irontalk objects. Objects which do not have STObject as a base class 
+	/// are wrapped using the <see cref="T:Irontalk.STInstance" /> class.
+	/// </summary>
 	public class STObject {
+		public STObject()
+		{
+		}
+		
+		public STObject(STClass @class)
+		{
+			Class = @class;	
+			InstanceContext = new LocalContext(GlobalContext.Instance, true);
+			InstanceContext.Declare("self");
+			InstanceContext.SetVariable("self", this);
+		}
+		
 		public virtual STClassDescription Class { get; set; }	
 		
 		/// <summary>
@@ -53,6 +74,13 @@ namespace Irontalk
 			return this;	
 		}
 		
+		public Context InstanceContext { get; private set; }
+		
+		public override string ToString ()
+		{
+			return Class.GenericInstanceName;
+		}
+		
 		[STRuntimeMethod("isNil")]
 		public virtual bool IsNil() { return false; }
 		[STRuntimeMethod("class")]
@@ -64,21 +92,16 @@ namespace Irontalk
 			try {
 				return Class.RouteMessage(msg);
 			} catch (MessageNotUnderstood e) {
-				if (message.Name == "didNotUnderstand:")
+				if (message.Name == "doesNotUnderstand:")
 					throw e;	// avoid infinite recursion
-				
-				try {
-					return Send (STSymbol.Get("didNotUnderstand:"), msg);
-				} catch (MessageNotUnderstood) {
-						return HandleDidNotUnderstand(msg);
-				}
+				Console.WriteLine ("!! " + e.Message);
+				return Send (STSymbol.Get("doesNotUnderstand:"), msg);
 			}
 		}
 		
-		public virtual STObject HandleDidNotUnderstand(STMessage msg)
+		public virtual STObject HandleDoesNotUnderstand(STMessage msg)
 		{
-			Console.Error.WriteLine("{0} didNotUnderstand: #{1}", msg.Receiver, msg.Selector.Name);
-			return STUndefinedObject.Instance;
+			throw new MessageNotUnderstood(msg);
 		}
 	}
 }

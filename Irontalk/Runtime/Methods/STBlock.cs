@@ -6,28 +6,6 @@ using PerCederberg.Grammatica.Runtime;
 using System.Reflection;
 namespace Irontalk
 {
-	public class BlockEvaluator : IBlockVisitor {
-		public BlockEvaluator (STBlock block, Compiler compiler)
-		{
-			Block = block;
-			Compiler = compiler;
-			Result = null;
-		}
-		
-		public STBlock Block { get; private set; }
-		public Compiler Compiler { get; private set; }
-		public STObject Result { get; private set; }
-		
-		public void VisitBlock (STBlock block)
-		{
-		}
-		
-		public void VisitStatement (Node statement)
-		{
-			Result = Compiler.EvaluateStatement(statement, Block.Context);
-		}
-	}
-	
 	public class STBlock : STRuntimeObject, IBlockVisitor {
 		public STBlock(Node blockLiteral, Context context, Compiler compiler)
 		{
@@ -81,7 +59,7 @@ namespace Irontalk
 		
 		public Compiler Compiler { get; private set; }
 		public Context OuterContext { get; private set; }
-		public Context Context { get; private set; }
+		public Context Context { get; set; }
 		public Node BlockLiteral { get; private set; }
 		public Node Sequence { get; private set; }
 		public MethodInfo Compiled { get; set; }
@@ -100,10 +78,34 @@ namespace Irontalk
 			Compiler.EvaluateStatement(statement, Context);
 		}
 		
-		[STRuntimeMethod("toString")]
+		[STRuntimeMethod("asString")]
 		public override string ToString()
 		{
 			return "a Block";
+		}
+		
+		public STObject EvaluateWith(Context context)
+		{
+			if (BlockArgumentNames.Length != 0)
+				throw new Exception("Incorrect number of arguments for block (expected " + BlockArgumentNames.Length + ")");
+			
+			if (Compiled != null)
+				throw new NotImplementedException();
+			
+			var eval = new BlockEvaluator (this, Compiler, context);
+			Visit (eval);
+			return eval.Result;
+		}
+		
+		[STRuntimeMethod("whileTrue:")]
+		public STObject WhileTrue(STBlock aBlock)
+		{
+			STObject lastValue = this;
+			
+			while ((bool)Evaluate().Native)
+				lastValue = aBlock.Evaluate();
+			
+			return lastValue;
 		}
 		
 		[STRuntimeMethod("value")]
@@ -115,7 +117,7 @@ namespace Irontalk
 			if (Compiled != null)
 				throw new NotImplementedException();
 			
-			var eval = new BlockEvaluator (this, Compiler);
+			var eval = new BlockEvaluator (this, Compiler, this.Context);
 			Visit (eval);
 			return eval.Result;
 		}
@@ -132,7 +134,7 @@ namespace Irontalk
 			if (Compiled != null)
 				throw new NotImplementedException();
 			
-			var eval = new BlockEvaluator (this, Compiler);
+			var eval = new BlockEvaluator (this, Compiler, this.Context);
 			Visit (eval);
 			return eval.Result;
 		}
@@ -149,7 +151,7 @@ namespace Irontalk
 			if (Compiled != null)
 				throw new NotImplementedException();
 			
-			var eval = new BlockEvaluator (this, Compiler);
+			var eval = new BlockEvaluator (this, Compiler, this.Context);
 			Visit (eval);
 			return eval.Result;
 		}

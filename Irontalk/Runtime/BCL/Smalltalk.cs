@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 namespace Irontalk
 {
-	public class Smalltalk : STObject {
+	public class SmalltalkImage : STRuntimeObject {
 		static bool initialized = false;
 		
 		public static void Initialize()
@@ -15,20 +15,26 @@ namespace Irontalk
 			if (!initialized) {
 				initialized = true;
 				
-				Import(GlobalContext.Instance.GetVariable("Irontalk"));
-				GlobalContext.Instance.AtPut("Integer", STClass.GetForCLR(typeof(long), "Integer"));
-				GlobalContext.Instance.AtPut("String", STClass.GetForCLR(typeof(string), "String"));
+				var gctx = GlobalContext.Instance;
+				var img = new SmalltalkImage();
+				
+				img.Import(gctx.GetVariable("Irontalk"));
+				gctx.SetVariable("Smalltalk", img);
+				gctx.SetVariable("Transcript", new Transcript(Console.Out));
+				gctx.SetVariable("Integer", STClass.GetForCLR(typeof(long), "Integer"));
+				gctx.SetVariable("String", STClass.GetForCLR(typeof(string), "String"));
+				gctx.SetVariable("Symbol", STClass.GetForCLR(typeof(STSymbol), "Symbol"));
 			}
 		}
 		
 		[STRuntimeMethod("version")]
-		public static string Version()
+		public string Version()
 		{
 			return "Irontalk 0.1";
 		}
 		
 		[STRuntimeMethod("import:")]
-		public static void Import(STObject nsObj)
+		public void Import(STObject nsObj)
 		{
 			var ns = nsObj as STNamespace;
 			

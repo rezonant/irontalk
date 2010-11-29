@@ -36,11 +36,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EvaluationTest.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="DotNetIntegrationTest.cs" />
-    <Compile Include="StandardsTest.cs" />
-    <Compile Include="Array.cs" />
+    <Compile Include="Evaluation\Blocks.cs" />
+    <Compile Include="Evaluation\WordArrayLiterals.cs" />
+    <Compile Include="Evaluation\ArrayLiterals.cs" />
+    <Compile Include="Evaluation\StringLiterals.cs" />
+    <Compile Include="Evaluation\Numbers.cs" />
+    <Compile Include="Evaluation\CompilerTestFixture.cs" />
+    <Compile Include="Evaluation\CharLiterals.cs" />
+    <Compile Include="Evaluation\MessagePassing.cs" />
+    <Compile Include="Runtime\Arrays.cs" />
+    <Compile Include="Runtime\DotNetIntegrationTest.cs" />
+    <Compile Include="Runtime\Standards.cs" />
+    <Compile Include="Runtime\Subclassing.cs" />
+    <Compile Include="Parsing\Comments.cs" />
+    <Compile Include="Parsing\Parsing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irontalk\Irontalk.csproj">
@@ -49,4 +59,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Evaluation\" />
+    <Folder Include="Runtime\" />
+    <Folder Include="Parsing\" />
+    <Folder Include="Evaluation\" />
+    <Folder Include="Evaluation\" />
+  </ItemGroup>
 </Project>

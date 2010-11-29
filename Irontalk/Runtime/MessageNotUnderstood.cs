@@ -8,7 +8,7 @@ namespace Irontalk
 {
 public class MessageNotUnderstood : Exception {
 		public MessageNotUnderstood(STMessage msg):
-			base ("Message not understood")
+			base ("Message #" + msg.Selector.Name + " not understood")
 		{
 			PendingMessage = msg;
 		}

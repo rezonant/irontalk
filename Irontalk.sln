@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irontalk.Tests", "Irontalk.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irontalk.Console", "Irontalk.Console\Irontalk.Console.csproj", "{C9CA730D-4587-4D8F-8DD3-B2AA74C3F9D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whiteboard", "Whiteboard\Whiteboard.csproj", "{CD69C65D-DF44-403F-BF2D-E05ECB10705E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irontalk.Gtk", "Irontalk.Gtk\Irontalk.Gtk.csproj", "{D2B4DDEE-2713-43C1-8864-9D69FA69299C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,8 +29,42 @@ Global
 		{C9CA730D-4587-4D8F-8DD3-B2AA74C3F9D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9CA730D-4587-4D8F-8DD3-B2AA74C3F9D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9CA730D-4587-4D8F-8DD3-B2AA74C3F9D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD69C65D-DF44-403F-BF2D-E05ECB10705E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD69C65D-DF44-403F-BF2D-E05ECB10705E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD69C65D-DF44-403F-BF2D-E05ECB10705E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD69C65D-DF44-403F-BF2D-E05ECB10705E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2B4DDEE-2713-43C1-8864-9D69FA69299C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2B4DDEE-2713-43C1-8864-9D69FA69299C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2B4DDEE-2713-43C1-8864-9D69FA69299C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2B4DDEE-2713-43C1-8864-9D69FA69299C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Irontalk\Irontalk.csproj
+		StartupItem = Irontalk.Gtk\Irontalk.Gtk.csproj
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = null
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.NamespaceBraceStyle = EndOfLine
+		$2.ClassBraceStyle = EndOfLine
+		$2.InterfaceBraceStyle = EndOfLine
+		$2.StructBraceStyle = EndOfLine
+		$2.EnumBraceStyle = EndOfLine
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.TabWidth = 4
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = text/x-csrc
+		$0.StandardHeader = $5
+		$5.Text = @\n Author:\n      ${AuthorName} <${AuthorEmail}>\n\n Copyright © ${Year} ${CopyrightHolder}\n\n This program is free software: you can redistribute it and/or modify\n it under the terms of the GNU General Public License as published by\n the Free Software Foundation, either version 3 of the License, or\n (at your option) any later version.\n\n As a special exception, the copyright holders of this library give\n you permission to link this library with independent modules to\n produce an executable, regardless of the license terms of these \n independent modules, and to copy and distribute the resulting \n executable under terms of your choice, provided that you also meet,\n for each linked independent module, the terms and conditions of the\n license of that module. An independent module is a module which is\n not derived from or based on this library. If you modify this library, you\n may extend this exception to your version of the library, but you are\n not obligated to do so. If you do not wish to do so, delete this\n exception statement from your version. \n\n This program is distributed in the hope that it will be useful, \n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU General Public License for more details.\n\n You should have received a copy of the GNU General Public License\n along with this program.  If not, see <http://www.gnu.org/licenses/>.
+		$5.inheritsSet = Apache2License
+		description = Irontalk aims to be a complete pragmatic implementation of Smalltalk targetting the Common Language Runtime.
 	EndGlobalSection
 EndGlobal

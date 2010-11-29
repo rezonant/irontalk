@@ -36,7 +36,7 @@ namespace Irontalk
 		
 		object[] array;
 		
-		[STRuntimeMethod("toString")]
+		[STRuntimeMethod("asString")]
 		public override string ToString ()
 		{
 			var sb = new StringBuilder();
@@ -44,7 +44,7 @@ namespace Irontalk
 			for (int i = 0, max = array.Length; i < max; ++i) {
 				object o = array[i];
 				if (o is STObject)
-					sb.Append((o as STObject).Send(STSymbol.Get("toString")).Native);
+					sb.Append((o as STObject).Send(STSymbol.Get("asString")).Native);
 				else 
 					sb.Append(o.ToString());
 				

@@ -1,0 +1,99 @@
+//
+//  Author:
+//       William Lahti <wilahti@gmail.com>
+// 
+//  Copyright © 2010 William Lahti
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  As a special exception, the copyright holders of this library give
+//  you permission to link this library with independent modules to
+//  produce an executable, regardless of the license terms of these 
+//  independent modules, and to copy and distribute the resulting 
+//  executable under terms of your choice, provided that you also meet,
+//  for each linked independent module, the terms and conditions of the
+//  license of that module. An independent module is a module which is
+//  not derived from or based on this library. If you modify this library, you
+//  may extend this exception to your version of the library, but you are
+//  not obligated to do so. If you do not wish to do so, delete this
+//  exception statement from your version. 
+// 
+//  This program is distributed in the hope that it will be useful, 
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+%header%
+
+GRAMMARTYPE = "LL"
+DESCRIPTION = "A grammar for Irontalk Smalltalk"
+AUTHOR      = "William Lahti <wilahti@gmail.com>"
+VERSION     = "1.0"
+DATE        = "2010/11/23"
+LICENSE     = "Permission is granted to copy this document verbatim in any
+               medium, provided that this copyright notice is left intact."
+COPYRIGHT   = "Copyright © 2010 William Lahti"
+
+%tokens%
+
+IGNORE              = <<"([^"]+"|".*)>> %ignore%
+S                   = <<[ \t\n\r\f]+>> %ignore%
+
+/*
+IDENT				= <<[\p{Ll}\p{Lu}\p{Lt}][\p{Ll}\p{Lu}\p{Lt}\p{Nd}]*>>
+KEYWORD				= <<[\p{Ll}\p{Lu}\p{Lt}][\p{Ll}\p{Lu}\p{Lt}\p{Nd}]*:>>
+SELECTOR			= <<([\p{Ll}\p{Lu}\p{Lt}][\p{Ll}\p{Lu}\p{Lt}\p{Nd}]*:?)+>>
+/*/
+IDENT				= <<[a-zA-Z_][a-zA-Z0-9_]*>>
+KEYWORD				= <<[a-zA-Z_][a-zA-Z0-9_]*:>>
+MULTI_KEYWORD		= <<([a-zA-Z_][a-zA-Z0-9_]*:)+>>
+BINARY			    = <<[-~,=\+/\*!@\$%&<>\?]+>>
+//*/
+
+STRING              = <<('([^']|'')*')>>
+CHAR				= <<\$.>>
+NUM			        = <<([0-9]+r)?[0-9]+(\.[0-9]+)?>>
+HASH				= "#"
+LEFT_PAREN          = "("
+RIGHT_PAREN         = ")"
+LEFT_BRACKET        = "["
+RIGHT_BRACKET       = "]"
+LEFT_BRACE          = "{"
+RIGHT_BRACE         = "}"
+COLON               = ":"
+SEMI_COLON          = ";"
+VAR_DELIM			= "|"
+DOT					= "."
+RETURN				= "^"
+ASSIGN				= ":="
+
+
+%productions%
+
+sequence			= var_def? statement+ ;
+var_def				= '|' IDENT+ '|' ;
+statement			= '.' | '^'? expression '.'*;
+expression			= receiver message* ( ';' message )*;
+
+receiver			= '(' expression ')' | array | block | CHAR | IDENT | 
+					  NUM | STRING | symbol | word_array ;
+symbol				= '#' ( IDENT | BINARY | KEYWORD | MULTI_KEYWORD | STRING ) ;
+array				= '{' ( expression ( '.' expression )* '.'? )? '}' ;
+block				= '[' block_params? sequence? ']' ;
+block_params		= ( ( ':' IDENT )+ '|' ) ;
+word_array			= '#' '(' 
+					  ( BINARY | IDENT | STRING | NUM | CHAR | word_array )*
+					  ')' ;
+
+message				= ( simple_send | keyword_send | assign_send );					  
+binary_send			= ( BINARY | '|' ) receiver unary_send* ;
+keyword_send		= ( KEYWORD receiver simple_send* )+;
+unary_send			= IDENT ;
+simple_send			= unary_send | binary_send ;
+assign_send			= ':=' expression ;

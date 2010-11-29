@@ -8,7 +8,7 @@
     <ProjectGuid>{110405A0-3A46-4365-954F-C1813ACB0765}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Irontalk</RootNamespace>
-    <AssemblyName>SmalltalkParser</AssemblyName>
+    <AssemblyName>Irontalk</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -20,6 +20,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="grammar.make" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -35,13 +40,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>grammatica-1.5.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Parser\SmalltalkAnalyzer.cs" />
-    <Compile Include="Parser\SmalltalkConstants.cs" />
-    <Compile Include="Parser\SmalltalkParser.cs" />
-    <Compile Include="Parser\SmalltalkTokenizer.cs" />
     <Compile Include="SingletonFactory.cs" />
     <Compile Include="Runtime\Classes\STClass.cs" />
     <Compile Include="Runtime\Classes\STClassDescription.cs" />
@@ -59,7 +61,6 @@
     <Compile Include="Runtime\Context\LocalContext.cs" />
     <Compile Include="Runtime\BCL\Smalltalk.cs" />
     <Compile Include="Runtime\STDebug.cs" />
-    <Compile Include="Compiler.cs" />
     <Compile Include="Runtime\MessageNotUnderstood.cs" />
     <Compile Include="Runtime\BCL\STBooleanDelegate.cs" />
     <Compile Include="Runtime\STRuntimeClassDelegateAttribute.cs" />
@@ -71,11 +72,26 @@
     <Compile Include="Runtime\BCL\STSymbol.cs" />
     <Compile Include="Runtime\Methods\STBlock.cs" />
     <Compile Include="Runtime\Methods\IBlockVisitor.cs" />
-    <Compile Include="Runtime\BCL\Array.cs" />
     <Compile Include="Runtime\BCL\Transcript.cs" />
+    <Compile Include="Runtime\STVariable.cs" />
+    <Compile Include="Runtime\Classes\ExtensionMethods.cs" />
+    <Compile Include="Runtime\Methods\STMethodBuilder.cs" />
+    <Compile Include="Runtime\Methods\STMethodPrototype.cs" />
+    <Compile Include="Runtime\Methods\BlockEvaluator.cs" />
+    <Compile Include="Parser\IrontalkAnalyzer.cs" />
+    <Compile Include="Parser\IrontalkConstants.cs" />
+    <Compile Include="Parser\IrontalkParser.cs" />
+    <Compile Include="Parser\IrontalkTokenizer.cs" />
+    <Compile Include="Compiler\Compiler.cs" />
+    <Compile Include="Compiler\ParseException.cs" />
+    <Compile Include="Compiler\SourceException.cs" />
+    <Compile Include="Compiler\CompileException.cs" />
+    <Compile Include="Compiler\ASTAnalyzer.cs" />
+    <Compile Include="Runtime\STRuntimeMetaclassDelegateAttribute.cs" />
+    <Compile Include="Runtime\BCL\Array.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Smalltalk.grammar" />
+    <None Include="Irontalk.grammar" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -84,5 +100,6 @@
     <Folder Include="Runtime\Methods\" />
     <Folder Include="Runtime\Context\" />
     <Folder Include="Runtime\BCL\" />
+    <Folder Include="Compiler\" />
   </ItemGroup>
 </Project>

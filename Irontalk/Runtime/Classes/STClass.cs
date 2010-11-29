@@ -50,30 +50,58 @@ namespace Irontalk
 			Metaclass = new STMetaclass(this);
 		}
 		
+		public STClass (STClass superclass, string name):
+			this (name)
+		{
+			this.superclass = superclass;
+			
+			Metaclass.MethodDictionary[STSymbol.Get("new")] = new STRuntimeMethod(delegate (STMessage msg)
+				{
+					return new STObject(this);
+				});
+		}
+		
 		static STClass()
 		{
 			foreach (var type in Assembly.GetExecutingAssembly().GetTypes()) {
-				var attr = Attribute.GetCustomAttribute(type, typeof(STRuntimeClassDelegateAttribute), true) 
+				var classAttr = Attribute.GetCustomAttribute(type, typeof(STRuntimeClassDelegateAttribute), true) 
 					as STRuntimeClassDelegateAttribute;	
-				if (attr == null) continue;
+				var metaclassAttr = Attribute.GetCustomAttribute(type, typeof(STRuntimeMetaclassDelegateAttribute), true)
+					as STRuntimeMetaclassDelegateAttribute;
 				
-				var @class = GetForCLR(attr.Type, attr.Branding);
-				
-				@class.InstallDelegate(type);
+				if (classAttr != null)
+					GetForCLR(classAttr.Type, classAttr.Branding).InstallDelegate(type);
+				else if (metaclassAttr != null)
+					GetForCLR(metaclassAttr.Type, metaclassAttr.Branding).Class.InstallDelegate(type);
+				else
+					continue;
 			}
 		}
 		
+		STClass superclass = null;
+		
+		public STCompiledMethod CompleteMethod (STMethodPrototype prototype, STBlock block)
+		{
+			return MethodDictionary[prototype.Selector] = new STNativeMethod(prototype, block);
+		}
+
 		public override void Initialize()
 		{
 			base.Initialize();	
 			Metaclass.Initialize();
 		}
 		
+		[STRuntimeMethod("superclass")]
+		public STClassDescription GetSuperclass() { return Superclass; }
+		
 		[STRuntimeMethod("subclass:")]
 		public STClass Subclass(STSymbol name)
 		{
 			Console.WriteLine ("Creating subclass of {0} named '{1}'", Type.FullName, name.Name);
-			return null; 
+			
+			var @class = new STClass(this, name.Name);
+			@class.Initialize();
+			return @class; 
 		}
 		
 		[STRuntimeMethod("subclass:namespace:")]
@@ -82,16 +110,63 @@ namespace Irontalk
 			var ns = nsObj as STNamespace;
 			
 			if (ns == null)
-				throw new Exception ("namespace parameter must hold a valid Namespace object.");
+				throw new Exception ("namespace parameter must hold a valid Namespace object, not " + nsObj.GetType().FullName);
 			
-			var @class = new STClass(name.Name);
-			@class.Initialize();
+			var @class = Subclass(name);
 			ns.Install(name, @class);
 			
 			return @class;
 		}
 		
-		[STRuntimeMethod("toString")]
+		[STRuntimeMethod("subclass:namespace:with:")]
+		public STClass SubclassNamespaceWith(STSymbol name, STObject nsObj, STBlock blockObj)
+		{
+			var @class = SubclassNamespace(name, nsObj);
+			@class.With(blockObj as STBlock);
+			return @class;
+		}
+		
+		[STRuntimeMethod("define")]
+		public STMethodBuilder Define()
+		{
+			return new STMethodBuilder(this);
+		}
+		
+		[STRuntimeMethod("define:")]
+		public STMethodPrototype Define(STObject symObj)
+		{
+			var sym = symObj as STSymbol;
+			
+			if (sym == null)
+				throw new Exception("Argument must be the symbol for the message to define");
+			
+			return new STMethodPrototype(this, sym, new STSymbol[0]);
+		}
+		
+		[STRuntimeMethod("define:with:")]
+		public STCompiledMethod DefineWith(STObject symObj, STObject blockObj)
+		{
+			var sym = symObj as STSymbol;
+			var block = blockObj as STBlock;
+			
+			if (sym == null)
+				throw new Exception("First parameter must be the symbol for the message to define");
+			
+			if (block == null)
+				throw new Exception("Second parameter must be a block");
+			
+			return CompleteMethod(Define(symObj), block);
+		}
+		
+		[STRuntimeMethod("with:")]
+		public void With(STBlock block)
+		{
+			block.Context = new LocalContext(block.Context);
+			block.Context.SetVariable("self", this);
+			block.Evaluate();
+		}
+		
+		[STRuntimeMethod("asString")]
 		public override string ToString ()
 		{
 			return Name;
@@ -99,6 +174,9 @@ namespace Irontalk
 
 		public override STClassDescription Superclass {
 			get {
+				if (superclass != null)
+					return superclass;
+				
 				if (Type != null) {
 					if (Type.BaseType == null)
 						return null;
@@ -109,16 +187,18 @@ namespace Irontalk
 			}
 		}
 		
-		public override STObject HandleDidNotUnderstand (STMessage msg)
+		[STRuntimeMethod("doesNotUnderstand:")]
+		public override STObject HandleDoesNotUnderstand (STMessage msg)
 		{
 			if (Type == null) 
-				return base.HandleDidNotUnderstand(msg);
+				return base.HandleDoesNotUnderstand(msg);
 			
 			// System Console writeLine: { 'thing1' . 'thing2' }
 			// --> System.Console.WriteLine("thing1", "thing2");
 			
+			Console.WriteLine ("Hrm odd");
 			if (msg.Parameters.Length > 1)
-				return base.HandleDidNotUnderstand(msg);
+				return base.HandleDoesNotUnderstand(msg);
 			
 			string name = msg.Selector.Name.Trim(':');
 			name = char.ToUpper(name[0]) + name.Substring(1);
@@ -148,11 +228,14 @@ namespace Irontalk
 			
 			MethodInfo method = null;
 			
-			if (stobj.Length == 0 && name != ".ctor") {
+			if (stobj.Length <= 1 && name != ".ctor") {
 				var props = Type.GetProperties(BindingFlags.Public | BindingFlags.Static);
 				foreach (var prop in props) {
 					if (prop.Name == name) {
-						method = prop.GetGetMethod();
+						if (stobj.Length == 0)
+							method = prop.GetGetMethod();
+						else
+							method = prop.GetSetMethod();
 						break;
 					}
 				}
@@ -164,7 +247,7 @@ namespace Irontalk
 				
 				if (ctor == null) {
 					Console.WriteLine ("failed to find matching constructor!");
-					return base.HandleDidNotUnderstand(msg);
+					return base.HandleDoesNotUnderstand(msg);
 				}
 				
 				return STInstance.For(ctor.Invoke(native));
@@ -183,7 +266,7 @@ namespace Irontalk
 				return STInstance.For(result);
 			}
 			
-			return base.HandleDidNotUnderstand(msg);
+			return base.HandleDoesNotUnderstand(msg);
 			
 #if false
 			if (Type == null) 
@@ -241,9 +324,9 @@ namespace Irontalk
 					metaclassInstance = new STClass("Metaclass");
 					metaclassInstance.Initialize();
 					
-					metaclassInstance.MethodDictionary[STSymbol.Get("toString")] =
+					metaclassInstance.MethodDictionary[STSymbol.Get("asString")] =
 						new STRuntimeMethod(STMetaclass.ToString);
-					metaclassInstance.Class.MethodDictionary[STSymbol.Get("toString")] =
+					metaclassInstance.Class.MethodDictionary[STSymbol.Get("asString")] =
 						new STRuntimeMethod(delegate(STMessage msg) {
 							return (msg.Receiver as STClass).Name;
 						});

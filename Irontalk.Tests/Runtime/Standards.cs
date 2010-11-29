@@ -3,15 +3,8 @@ using NUnit.Framework;
 namespace Irontalk.Tests
 {
 	[TestFixture]
-	public class StandardsTest
+	public class Standards: CompilerTestFixture
 	{
-		public StandardsTest ()
-		{
-			compiler = new Compiler();
-		}
-		
-		Compiler compiler;
-		
 		[Test]
 		public void ClassStructure()
 		{
@@ -58,11 +51,26 @@ namespace Irontalk.Tests
 		}
 		
 		[Test]
+		public void HasSymbolClass()
+		{
+			var @class = compiler.Evaluate("Symbol");
+			var instance = compiler.Evaluate("#foo");
+			
+			Assert.IsNotNull(@class);
+			Assert.IsNotNull(instance);
+			
+			Assert.IsInstanceOfType(typeof(STClass), @class);
+			Assert.IsInstanceOfType(typeof(STObject), instance);
+			
+			Assert.AreEqual((instance as STObject).Class, @class);
+		}
+		
+		[Test]
 		public void HasSmalltalkClass()
 		{
-			var @class = compiler.Evaluate("Smalltalk");
-			Assert.IsNotNull(@class);
-			Assert.IsInstanceOfType(typeof(STClass), @class);
+			var smi = compiler.Evaluate("Smalltalk");
+			Assert.IsNotNull(smi);
+			Assert.IsInstanceOfType(typeof(SmalltalkImage), smi);
 		}
 		
 		[Test]
@@ -77,9 +85,9 @@ namespace Irontalk.Tests
 		[Test]
 		public void HasTranscriptClass()
 		{
-			var @class = compiler.Evaluate("Transcript");
-			Assert.IsNotNull(@class);
-			Assert.IsInstanceOfType(typeof(STClass), @class);
+			var tr = compiler.Evaluate("Transcript");
+			Assert.IsNotNull(tr);
+			Assert.IsInstanceOfType(typeof(Transcript), tr);
 		}
 		
 		[Test]

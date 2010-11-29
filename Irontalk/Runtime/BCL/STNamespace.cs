@@ -6,7 +6,7 @@ using PerCederberg.Grammatica.Runtime;
 using System.Reflection;
 namespace Irontalk
 {
-public class STNamespace : STRuntimeObject {
+	public class STNamespace : STRuntimeObject {
 		public STNamespace(string name, string fullName)
 		{
 			Name = name;
@@ -27,13 +27,20 @@ public class STNamespace : STRuntimeObject {
 		[STRuntimeMethod("name")]
 		protected string GetName() { return Name; }
 		
-		[STRuntimeMethod("didNotUnderstand:")]
-		protected object DidNotUnderstand(STMessage msg)
+		[STRuntimeMethod("doesNotUnderstand:")]
+		protected object DoesNotUnderstand(STMessage msg)
 		{
 			if (Map.ContainsKey(msg.Selector))
 				return Map[msg.Selector];
 			
 			var t = Type.GetType(string.Format("{0}.{1}", FullName, msg.Selector.Name));
+			
+			if (t == null) {
+				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies()) {
+					t = asm.GetType(string.Format("{0}.{1}", FullName, msg.Selector.Name));
+					if (t != null) break;
+				}
+			}
 			
 			if (t != null) {
 				var @class = STClass.GetForCLR(t, t.Name);
@@ -41,15 +48,20 @@ public class STNamespace : STRuntimeObject {
 				return @class;
 			}
 			
+			var ns = new STNamespace(msg.Selector.Name, FullName + "." + msg.Selector.Name);
+			Map[msg.Selector] = ns;
+			return ns;
+			/*
 			try {
-				return Class.Superclass.RouteMessage(new STMessage(this, STSymbol.Get("didNotUnderstand:"), msg));
+				return Class.Superclass.RouteMessage(new STMessage(this, STSymbol.Get("doesNotUnderstand:"), msg));
 			} catch (MessageNotUnderstood) {
-				Console.Error.WriteLine ("No one implements didNotUnderstand:! Bailing out.");
+				Console.Error.WriteLine ("No one implements doesNotUnderstand:! Bailing out.");
 				return STUndefinedObject.Instance;
 			}
+			*/
 		}
 		
-		[STRuntimeMethod("toString")]
+		[STRuntimeMethod("asString")]
 		public override string ToString ()
 		{
 			return string.Format("Namespace({0})", FullName);

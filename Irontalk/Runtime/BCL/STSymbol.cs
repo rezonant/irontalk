@@ -6,7 +6,7 @@ using PerCederberg.Grammatica.Runtime;
 using System.Reflection;
 namespace Irontalk
 {
-public class STSymbol : STRuntimeObject {
+	public class STSymbol : STRuntimeObject {
 		private STSymbol(string str)
 		{
 			Name = str;
@@ -19,12 +19,13 @@ public class STSymbol : STRuntimeObject {
 			get { return STClass.GetForCLR(GetType(), "Symbol"); }	
 		}
 		
-		[STRuntimeMethod("toString")]
+		[STRuntimeMethod("asString")]
 		public override string ToString ()
 		{
 			return string.Format("#{0}", Name);
 		}
-
+		
+		[STRuntimeMethod("intern")]
 		public static STSymbol Get(string name)
 		{
 			STSymbol value;

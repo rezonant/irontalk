@@ -2,16 +2,15 @@ using System;
 using NUnit.Framework;
 namespace Irontalk.Tests
 {
+	public class PropertyTestClass {
+		public object InstanceProperty { get; set; }
+		static object staticProperty = null;
+		public static object StaticProperty { get { return staticProperty; } set { staticProperty = value; } }
+	}
+	
 	[TestFixture]
-	public class DotNetIntegrationTest
+	public class DotNetIntegrationTest: CompilerTestFixture
 	{
-		public DotNetIntegrationTest ()
-		{
-			compiler = new Compiler();
-		}
-		
-		Compiler compiler;
-		
 		[Test]
 		public void TopLevelNamespace()
 		{
@@ -55,6 +54,50 @@ namespace Irontalk.Tests
 			Assert.IsInstanceOfType(typeof(STInstance), falseObj);
 			Assert.AreEqual(STBooleanDelegate.True, trueObj);
 			Assert.AreEqual(STBooleanDelegate.False, falseObj);
+		}
+		
+		[Test]
+		public void NativeInstancePropertyGetMessage()
+		{
+			var ctx = new LocalContext();
+			var inst = new PropertyTestClass();
+			
+			inst.InstanceProperty = 3;
+			
+			ctx.SetVariable("x", new STInstance(inst));
+			var three = compiler.Evaluate("x instanceProperty", ctx);
+			Assert.IsNotNull(three);
+			Assert.IsInstanceOfType(typeof(STInstance), three);
+			Assert.AreEqual((three as STInstance).Target, (long)3);
+		}
+		
+		[Test]
+		public void NativeInstancePropertySetMessage()
+		{
+			var ctx = new LocalContext();
+			var inst = new PropertyTestClass();
+			
+			ctx.SetVariable("x", new STInstance(inst));
+			compiler.Evaluate("x instanceProperty: 3", ctx);
+			Assert.AreEqual((long)3, inst.InstanceProperty);
+		}
+		
+		[Test]
+		public void NativeStaticPropertyGetMessage()
+		{	
+			PropertyTestClass.StaticProperty = 3;
+			
+			var three = compiler.Evaluate("Irontalk Tests PropertyTestClass staticProperty");
+			Assert.IsNotNull(three);
+			Assert.IsInstanceOfType(typeof(STInstance), three);
+			Assert.AreEqual((three as STInstance).Target, (long)3);
+		}
+		
+		[Test]
+		public void NativeStaticPropertySetMessage()
+		{
+			compiler.Evaluate("Irontalk Tests PropertyTestClass staticProperty: 3");
+			Assert.AreEqual((long)3, PropertyTestClass.StaticProperty);
 		}
 		
 		[Test]

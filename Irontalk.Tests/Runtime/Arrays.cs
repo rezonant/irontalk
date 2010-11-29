@@ -3,15 +3,8 @@ using NUnit.Framework;
 namespace Irontalk.Tests
 {
 	[TestFixture]
-	public class Array
+	public class Arrays: CompilerTestFixture
 	{
-		public Array ()
-		{
-			compiler = new Compiler();
-		}
-		
-		Compiler compiler;
-		
 		[Test]
 		public void NewEmpty()
 		{
