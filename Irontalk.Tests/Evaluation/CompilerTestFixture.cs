@@ -38,6 +38,11 @@ namespace Irontalk.Tests {
 		}
 		
 		protected Compiler compiler;
+		
+		protected void AssertOutput(string input, object output)
+		{
+			Assert.AreEqual(output, compiler.Evaluate(input).Native);
+		}
 	}
 }
 
