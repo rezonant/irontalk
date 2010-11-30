@@ -7,5 +7,3 @@
 bin
 *test-results*
 *.test-cache
-.~lock*
-*.pidb

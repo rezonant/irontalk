@@ -41,7 +41,6 @@
     <Compile Include="Evaluation\WordArrayLiterals.cs" />
     <Compile Include="Evaluation\ArrayLiterals.cs" />
     <Compile Include="Evaluation\StringLiterals.cs" />
-    <Compile Include="Evaluation\Numbers.cs" />
     <Compile Include="Evaluation\CompilerTestFixture.cs" />
     <Compile Include="Evaluation\CharLiterals.cs" />
     <Compile Include="Evaluation\MessagePassing.cs" />
@@ -51,6 +50,9 @@
     <Compile Include="Runtime\Subclassing.cs" />
     <Compile Include="Parsing\Comments.cs" />
     <Compile Include="Parsing\Parsing.cs" />
+    <Compile Include="Evaluation\NumberLiterals.cs" />
+    <Compile Include="Runtime\Integers.cs" />
+    <Compile Include="Runtime\Strings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irontalk\Irontalk.csproj">

@@ -23,21 +23,19 @@ namespace Irontalk.Tests
 		[Test]
 		public void ParenthesizeSimple()
 		{
-			var result = compiler.Evaluate("(3) class");
+			var result = compiler.Evaluate("(3) + 2");
 			Assert.IsNotNull(result);
-			Assert.IsInstanceOfType(typeof(STClass), result);
-			Assert.IsNotNull((result as STClass).Type);
-			Assert.AreEqual((result as STClass).Type, typeof(long));
+			Assert.IsInstanceOfType(typeof(STInstance), result);
+			Assert.AreEqual((long)5, result.Native);
 		}
 		
 		[Test]
 		public void ParenthesizeComplex()
 		{
-			var result = compiler.Evaluate("(3 + 2) class");
+			var result = compiler.Evaluate("(3 + 2) * 2");
 			Assert.IsNotNull(result);
-			Assert.IsInstanceOfType(typeof(STClass), result);
-			Assert.IsNotNull((result as STClass).Type);
-			Assert.AreEqual((result as STClass).Type, typeof(long));
+			Assert.IsInstanceOfType(typeof(STInstance), result);
+			Assert.AreEqual((long)10, result.Native);
 		}
 	}
 }

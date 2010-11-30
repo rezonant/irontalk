@@ -102,6 +102,7 @@ public partial class MainWindow
 		this.vpaned1.Position = 195;
 		// Container child vpaned1.Gtk.Paned+PanedChild
 		this.vbox1 = new global::Gtk.VBox ();
+		this.vbox1.Name = "vbox1";
 		this.vbox1.Spacing = 6;
 		// Container child vbox1.Gtk.Box+BoxChild
 		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='stopAction' action='stopAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='WordWrapAction' action='WordWrapAction'/><menuitem name='ShowParseTreeBeforeEvaluatingAction' action='ShowParseTreeBeforeEvaluatingAction'/><menuitem name='PrintInputBeforeEvaluatingAction' action='PrintInputBeforeEvaluatingAction'/></menu><menu name='ModeAction' action='ModeAction'><menuitem name='EvaluateAction' action='EvaluateAction'/><menuitem name='ParseOnlyAction' action='ParseOnlyAction'/></menu></menubar></ui>");

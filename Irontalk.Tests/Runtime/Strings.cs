@@ -28,19 +28,25 @@
 // 
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 using System;
 using NUnit.Framework;
 namespace Irontalk.Tests {
 	[TestFixture]
-	public class Numbers: CompilerTestFixture {
+	public class Strings : CompilerTestFixture {
 		[Test]
-		public void NumLiteral()
+		public void StringSpace ()
 		{
-			var result = compiler.Evaluate("3");
-			Assert.IsNotNull(result);
-			Assert.That(result.Class == STClass.GetForCLR(typeof(long), "Integer"));
-			Assert.That(result.Native.Equals((long)3));
+			var result = compiler.Evaluate("String space");
+			Assert.IsNotNull (result);
+			Assert.AreEqual(" ", result.Native);
+		}
+		
+		[Test]
+		public void StringCr()
+		{
+			var result = compiler.Evaluate("String cr");
+			Assert.IsNotNull (result);
+			Assert.AreEqual("\n", result.Native);
 		}
 	}
 }
