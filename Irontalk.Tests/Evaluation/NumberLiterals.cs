@@ -56,7 +56,7 @@ namespace Irontalk.Tests {
 		[ExpectedException(typeof(ParseException))]
 		public void NegativesCantBreathe()
 		{
-			var result = compiler.Evaluate("- 3");
+			compiler.Evaluate("- 3");
 		}
 		
 		[Test]
@@ -171,7 +171,7 @@ namespace Irontalk.Tests {
 		[ExpectedException(typeof(CompileException))]
 		public void Radix12DoesNotAcceptC()
 		{
-			var result = compiler.Evaluate("16rcc");
+			compiler.Evaluate("16rcc");
 		}
 	}
 }

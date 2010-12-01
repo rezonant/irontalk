@@ -53,6 +53,7 @@
     <Compile Include="Evaluation\NumberLiterals.cs" />
     <Compile Include="Runtime\Integers.cs" />
     <Compile Include="Runtime\Strings.cs" />
+    <Compile Include="Runtime\Exceptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irontalk\Irontalk.csproj">
