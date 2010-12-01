@@ -73,27 +73,32 @@ namespace Irontalk
 			if (method != null) {
 				var stobj = new List<STObject>();
 				var parmInfo = method.GetParameters();
-				
-				if (PassReceiver)
-					stobj.Insert(0, message.Receiver);
-				
-				stobj.AddRange(message.Parameters);
-				
 				List<object> native = new List<object> ();
-				for (int i = 0, max = stobj.Count; i < max; ++i) {
-					var parmType = parmInfo[i].ParameterType;
-					if (parmType == typeof(STObject) || parmType.IsSubclassOf(typeof(STObject))) {
-						native.Add (stobj[i]);
-					} else {
-						native.Add(stobj[i].Native);
+				
+				if (parmInfo.Length > 0 || message.Parameters.Length > 0) {
+					if (PassReceiver)
+						stobj.Add(message.Receiver);
+					
+					stobj.AddRange(message.Parameters);
+					
+					for (int i = 0, max = stobj.Count; i < max; ++i) {
+						var parmType = parmInfo[i].ParameterType;
+						if (parmType == typeof(STObject) || parmType.IsSubclassOf(typeof(STObject))) {
+							native.Add (stobj[i]);
+						} else {
+							native.Add(stobj[i].Native);
+						}
 					}
 				}
 				
-				result = method.Invoke(message.Receiver.MethodReceiver, native.ToArray());
+				try {
+					result = method.Invoke(message.Receiver.MethodReceiver, native.ToArray());
+				} catch (TargetInvocationException tie) {
+					throw tie.InnerException;
+				}
 				
 				if (method.ReturnType == typeof(void))
 					result = message.Receiver;
-				
 			} else if (@delegate != null) {
 				result = @delegate(message);
 			} else {
