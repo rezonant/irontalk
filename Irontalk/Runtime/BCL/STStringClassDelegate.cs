@@ -30,42 +30,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using NUnit.Framework;
-
-namespace Irontalk.Tests {
-	[TestFixture()]
-	public class StringLiterals: CompilerTestFixture {
-		[Test]
-		public void Simple()
-		{
-			var result = compiler.Evaluate("'hello'");
-			Assert.IsNotNull(result);
-			Assert.That(result.Class == STClass.GetForCLR(typeof(string), "String"));
-			Assert.That(result.Native.Equals("hello"));
-		}
-		
-		/// <summary>
-		/// This test ensures that the string token is properly formed. The hash portion
-		/// of the evaluated string should not be part of a string literal (ie, the following
-		/// should parse as 'hello', # {syntax error}, 'world', not as a single string token
-		/// containing "'hello' #### 'world'").
-		/// </summary>
-		[Test]
-		[ExpectedException(typeof(Irontalk.ParseException))]
-		public void StringTokensAreMinimal()
-		{ 
-			compiler.Evaluate("'hello' : - - : 'world'");
-		}
-		
-		[Test]
-		public void EscapeQuotes()
-		{
-			var result = compiler.Evaluate("'Aren''t you glad?'");
-			Assert.IsNotNull(result);
-			Assert.AreSame(STClass.GetForCLR(typeof(string), "String"), result.Class);
-			Assert.AreEqual("Aren't you glad?", result.Native);
-		}
-		
+using System.IO;
+using System.Collections.Generic;
+using PerCederberg.Grammatica.Runtime;
+using System.Reflection;
+namespace Irontalk {
+	[STRuntimeMetaclassDelegate(typeof(string), "String")]
+	public static class STStringClassDelegate {
+		[STRuntimeMethod("cr")] public static string Cr() { return "\n"; }
+		[STRuntimeMethod("space")] public static string Space() { return " "; }
 	}
 }
-
