@@ -89,6 +89,9 @@
     <Compile Include="Compiler\ASTAnalyzer.cs" />
     <Compile Include="Runtime\STRuntimeMetaclassDelegateAttribute.cs" />
     <Compile Include="Runtime\BCL\Array.cs" />
+    <Compile Include="Runtime\BCL\STStringDelegate.cs" />
+    <Compile Include="Runtime\BCL\STStringClassDelegate.cs" />
+    <Compile Include="STExceptionDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Irontalk.grammar" />
