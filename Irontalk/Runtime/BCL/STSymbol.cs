@@ -25,6 +25,11 @@ namespace Irontalk
 			return string.Format("#{0}", Name);
 		}
 		
+		public static implicit operator STSymbol(string s)
+		{
+			return STSymbol.Get(s);	
+		}
+		
 		[STRuntimeMethod("intern")]
 		public static STSymbol Get(string name)
 		{
