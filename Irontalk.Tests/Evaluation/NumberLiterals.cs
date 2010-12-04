@@ -91,8 +91,8 @@ namespace Irontalk.Tests {
 		{
 			var result = compiler.Evaluate("10r3");
 			Assert.IsNotNull(result);
-			Assert.That(result.Class == STClass.GetForCLR(typeof(long), "Integer"));
-			Assert.That(result.Native.Equals((long)3));
+			Assert.AreSame(STClass.GetForCLR(typeof(long), "Integer"), result.Class);
+			Assert.AreEqual((long)3, result.Native);
 		}
 		
 		[Test]
@@ -100,8 +100,8 @@ namespace Irontalk.Tests {
 		{
 			var result = compiler.Evaluate("2r110");
 			Assert.IsNotNull(result);
-			Assert.That(result.Class == STClass.GetForCLR(typeof(long), "Integer"));
-			Assert.That(result.Native.Equals((long)6));
+			Assert.AreSame(STClass.GetForCLR(typeof(long), "Integer"), result.Class);
+			Assert.AreEqual((long)6, result.Native);
 		}
 		
 		[Test]
@@ -170,8 +170,8 @@ namespace Irontalk.Tests {
 		[Test]
 		[ExpectedException(typeof(CompileException))]
 		public void Radix12DoesNotAcceptC()
-		{
-			compiler.Evaluate("16rcc");
+		{	
+			compiler.Evaluate("12rcc");
 		}
 	}
 }

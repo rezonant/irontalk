@@ -61,6 +61,20 @@ namespace Irontalk {
 		public virtual void VisitKeywordSend (Node keywordSend) {}
 	}
 	
+	public class DigitValueOutOfRangeException : Exception {
+		public DigitValueOutOfRangeException(char digit, int @base):
+				base(string.Format(ErrorMessage, digit, @base))
+		{
+			Digit = digit;
+			Radix = @base;
+		}
+		
+		const string ErrorMessage = "The digit {0} is invalid for radix {1}";
+		
+		public char Digit;
+		public int Radix;
+	}
+	
 	public static class ParseTreeVisiting {
 		public static void Visit (this Node node, IParseTreeVisitor visitor)
 		{
@@ -106,13 +120,80 @@ namespace Irontalk {
 		
 		Assembly Assembly { get; set; }
 		IrontalkParser Parser { get; set; }
+		InputSource Source { get; set; }
+		
+		public int GetDigitValue (char literal)
+		{
+			if (char.IsNumber(literal))
+				return int.Parse(literal.ToString());	
+			if (char.IsLetter(literal)) {
+				if (char.IsUpper(literal))
+					return 10 + (int)(literal - 'A');
+				else if (char.IsLower(literal))
+					return 10 + (int)(literal - 'a');
+			}
+			
+			throw new InvalidOperationException("The digit character to convert must be in range 0-9 or A-F (case insensitive)");
+		}
+		
+		public int GetDigitValue (char literal, int maxValue)
+		{
+			int value = GetDigitValue (literal);
+			if (value >= maxValue) throw new DigitValueOutOfRangeException(literal, maxValue);
+			return value;
+		}
 		
 		public STObject GetNumberLiteral (Token literal)
 		{
-			if (literal.Image.Contains("."))
-				return STInstance.For(double.Parse(literal.Image));
-			else
-				return STInstance.For(long.Parse(literal.Image));
+			try {
+				string input = literal.Image;
+				int rloc = input.IndexOf("r");
+				
+				if (rloc > 0) {
+					// Radix numbers
+					int sign = 1;
+					
+					if (input.StartsWith("-")) {
+						sign *= -1;
+						input = input.Substring(1);
+						--rloc;
+					}
+						
+					int @base = int.Parse(input.Substring(0, rloc));
+					input = input.Substring(rloc + 1);
+					
+					if (input.StartsWith("-")) {
+						sign *= -1;	
+					}
+					
+					string[] parts = input.Split('.');
+					long wholePart = 0;
+					string wholePartStr = parts[0];
+					
+					for (int i = wholePartStr.Length - 1, power = 0; i >= 0; --i, ++power)
+						wholePart += GetDigitValue(wholePartStr[i], @base) * (int)Math.Pow(@base, power);
+					
+					if (parts.Length > 1) {
+						// has decimal point
+						double dec = wholePart;
+						string decStr = parts[1];
+						
+						for (int i = 0, max = decStr.Length; i < max; ++i)
+							dec += GetDigitValue(decStr[i], @base) * Math.Pow(@base, -(i + 1));
+						
+						return new STInstance(dec * sign);
+					}
+					
+					return new STInstance(wholePart * sign);
+				}
+				
+				if (input.Contains("."))
+					return STInstance.For(double.Parse(literal.Image));
+				else
+					return STInstance.For(long.Parse(literal.Image));		
+			} catch (Exception e) {
+				throw new CompileException(Source, literal.StartLine, "Error parsing numeric literal: " + e.Message, e);	
+			}
 		}
 		
 		public STObject GetStringLiteral (Token literal)
@@ -308,6 +389,14 @@ namespace Irontalk {
 			return Evaluate (text, new LocalContext());
 		}
 		
+		public STObject EvaluateStatement (Node statement, Context context)
+		{
+			if (statement.GetChildAt(0).Name != "expression")
+				return STUndefinedObject.Instance;
+			
+			return EvaluateExpression(statement.GetChildAt(0), context);
+		}
+		
 		public STObject Evaluate (Node sequence, Context context)
 		{
 			int start = 0;
@@ -323,41 +412,32 @@ namespace Irontalk {
 			return last;
 		}
 		
-		public STObject EvaluateStatement (Node statement, Context context)
+		public STObject Evaluate (InputSource source, Context context)
 		{
-			if (statement.GetChildAt(0).Name != "expression")
-				return STUndefinedObject.Instance;
-			
-			return EvaluateExpression(statement.GetChildAt(0), context);
+			Source = source;
+			try {
+				Node root = source.Parse(Parser);
+				
+				if (root == null)
+					return STUndefinedObject.Instance; // parser found empty string so aborted
+				
+				if (STDebug.ShowParseTrees) {
+					var tr = Transcript.Instance;
+					if (tr != null)
+						root.PrintTo(tr.Out);
+					else
+						root.PrintTo(Console.Out);
+				}
+				
+				return Evaluate (root, context);
+			} finally {
+				Source = null;	
+			}
 		}
-		
 		
 		public STObject Evaluate (string str, Context context)
 		{
-			str = str.Trim('\n', ' ', '\t');
-			
-			if (str == string.Empty)
-				return STUndefinedObject.Instance;
-			
-			Parser.Reset(new StringReader (str + " \n."));
-			Node root;
-			
-			try {
-				root = Parser.Parse();
-			} catch (ParserLogException e) {
-				var error = e.GetError(0);
-				throw new ParseException(new InputSource("input", null), error.Line, error.Message);
-			}
-			
-			if (STDebug.ShowParseTrees) {
-				var tr = Transcript.Instance;
-				if (tr != null)
-					root.PrintTo(tr.Out);
-				else
-					root.PrintTo(Console.Out);
-			}
-			
-			return Evaluate (root, context);
+			return Evaluate (new EvalSource (str), context);
 		}
 	}
 }

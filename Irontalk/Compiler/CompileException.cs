@@ -36,5 +36,10 @@ namespace Irontalk {
 			base (source, lineNumber, message)
 		{
 		}
+		
+		public CompileException (InputSource source, int lineNumber, string message, Exception innerException):
+			base (source, lineNumber, message, innerException)
+		{
+		}
 	}
 }

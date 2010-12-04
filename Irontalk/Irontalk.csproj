@@ -92,6 +92,9 @@
     <Compile Include="Runtime\BCL\STStringDelegate.cs" />
     <Compile Include="Runtime\BCL\STStringClassDelegate.cs" />
     <Compile Include="STExceptionDelegate.cs" />
+    <Compile Include="Compiler\InputSource.cs" />
+    <Compile Include="Compiler\FileSource.cs" />
+    <Compile Include="Compiler\EvalSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Irontalk.grammar" />

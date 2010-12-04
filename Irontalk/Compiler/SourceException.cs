@@ -31,31 +31,19 @@
 
 using System;
 using System.IO;
+using PerCederberg.Grammatica.Runtime;
+
 namespace Irontalk {
-	public class InputSource {
-		public InputSource (string name, TextReader input)
-		{
-			Input = input;
-			Name = name;
-		}
-		
-		public string Name { get; private set; }
-		public TextReader Input { get; private set; }
-	}
-	
-	public class FileSource : InputSource {
-		public FileSource (string filename):
-			base (Path.GetFileName(filename), new StreamReader(filename))
-		{
-			Filename = filename;
-		}
-		
-		public string Filename { get; private set; }
-	}
-	
 	public class SourceException : Exception {
 		public SourceException (InputSource source, int lineNumber, string message):
 			base (message)
+		{
+			Input = source;
+			LineNumber = lineNumber;
+		}
+		
+		public SourceException (InputSource source, int lineNumber, string message, Exception innerException):
+			base (message, innerException)
 		{
 			Input = source;
 			LineNumber = lineNumber;
