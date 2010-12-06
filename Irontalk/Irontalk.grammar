@@ -58,7 +58,7 @@ BINARY			    = <<[-~,=\+/\*!@\$%&<>\?]+>>
 
 STRING              = <<('([^']|'')*')>>
 CHAR				= <<\$.>>
-NUM			        = <<-?(([0-9]+r)?[0-9A-Za-z]+|[0-9]+)(\.[0-9]+)?>>
+NUM			        = <<-?(([0-9]+r)-?[0-9A-Za-z]*|[0-9]+)(\.[0-9]+)?>>
 HASH				= "#"
 LEFT_PAREN          = "("
 RIGHT_PAREN         = ")"
@@ -76,9 +76,9 @@ ASSIGN				= ":="
 
 %productions%
 
-sequence			= var_def? statement+ ;
+sequence			= '.' | var_def? statement ( '.'+ statement? )*;
 var_def				= '|' IDENT+ '|' ;
-statement			= '.' | '^'? expression '.'*;
+statement			= '^'? expression;
 expression			= receiver message* ( ';' message )*;
 
 receiver			= '(' expression ')' | array | block | CHAR | IDENT | 
