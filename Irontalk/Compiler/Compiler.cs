@@ -50,6 +50,20 @@ namespace Irontalk {
 		void VisitKeywordSend (Node keywordSend);
 	}
 	
+	/// <summary>
+	/// Used to represent a Smalltalk return operation.
+	/// </summary>
+	public class ReturnException : Exception {
+		public ReturnException(STObject value, Context context):
+			base ("The value " + value + " is being returned")
+		{
+			Value = value;	
+		}
+		
+		public STObject Value { get; private set; }
+		public Context Context { get; private set; }
+	}
+	
 	public abstract class ParseTreeVisitor {
 		public virtual void VisitVariableDefinition (Node vardef) {}
 		public virtual void VisitStatement (Node statement) {}
@@ -133,7 +147,9 @@ namespace Irontalk {
 					return 10 + (int)(literal - 'a');
 			}
 			
-			throw new InvalidOperationException("The digit character to convert must be in range 0-9 or A-F (case insensitive)");
+			throw new InvalidOperationException(
+				"The digit to convert must be in range 0-9 or A-F (case insensitive) " +
+			                                    "(character '" + literal + "' was provided)");
 		}
 		
 		public int GetDigitValue (char literal, int maxValue)
@@ -151,6 +167,10 @@ namespace Irontalk {
 				
 				if (rloc > 0) {
 					// Radix numbers
+					
+					if (input.EndsWith("r"))
+						throw new ParseException(Source, literal.StartLine, "Expected a digit between 0 and 9 following 'r'");
+					
 					int sign = 1;
 					
 					if (input.StartsWith("-")) {
@@ -164,6 +184,7 @@ namespace Irontalk {
 					
 					if (input.StartsWith("-")) {
 						sign *= -1;	
+						input = input.Substring(1);
 					}
 					
 					string[] parts = input.Split('.');
@@ -191,6 +212,8 @@ namespace Irontalk {
 					return STInstance.For(double.Parse(literal.Image));
 				else
 					return STInstance.For(long.Parse(literal.Image));		
+			} catch (ParseException e) {
+				throw e;
 			} catch (Exception e) {
 				throw new CompileException(Source, literal.StartLine, "Error parsing numeric literal: " + e.Message, e);	
 			}
@@ -384,17 +407,30 @@ namespace Irontalk {
 			return receiver;
 		}
 		
+		public STObject EvaluateStatement (Node statement, Context context)
+		{
+			int exprIndex = 0;
+			bool returning = false;
+			Console.WriteLine (statement.Name);
+			if (statement[0].Name == "RETURN") {
+				returning = true;
+				++exprIndex;
+			}
+			
+			if (statement[exprIndex].Name != "expression")
+				return STUndefinedObject.Instance;
+			
+			var value = EvaluateExpression(statement[exprIndex], context);
+			
+			if (returning)
+				throw new ReturnException(value, context);
+			
+			return value;
+		}
+		
 		public STObject Evaluate (string text)
 		{
 			return Evaluate (text, new LocalContext());
-		}
-		
-		public STObject EvaluateStatement (Node statement, Context context)
-		{
-			if (statement.GetChildAt(0).Name != "expression")
-				return STUndefinedObject.Instance;
-			
-			return EvaluateExpression(statement.GetChildAt(0), context);
 		}
 		
 		public STObject Evaluate (Node sequence, Context context)
@@ -406,8 +442,11 @@ namespace Irontalk {
 			
 			STObject last = STUndefinedObject.Instance;
 			
-			for (int i = start, max = sequence.GetChildCount(); i < max; ++i)
-				last = EvaluateStatement (sequence.GetChildAt(i), context);
+			for (int i = start, max = sequence.Count; i < max; ++i) {
+				var node = sequence[i];
+				if (node.Name == "DOT") continue;
+				last = EvaluateStatement (node, context);
+			}
 			
 			return last;
 		}
@@ -437,7 +476,11 @@ namespace Irontalk {
 		
 		public STObject Evaluate (string str, Context context)
 		{
-			return Evaluate (new EvalSource (str), context);
+			try {
+				return Evaluate (new EvalSource (str), context);
+			} catch (ReturnException e) {
+				return e.Value;	
+			}
 		}
 	}
 }
