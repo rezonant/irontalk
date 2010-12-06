@@ -59,12 +59,16 @@ namespace Irontalk {
 		
 		public override STObject Invoke(STMessage message)
 		{
-			var instanceCtx = message.Receiver.InstanceContext;
-			var invocationCtx = new LocalContext (instanceCtx);
-			for (int i = 0, max = Prototype.ParameterNames.Length; i < max; ++i)
-				invocationCtx.SetVariable(Prototype.ParameterNames[i].Name, message.Parameters[i]);
-			
-			return Block.EvaluateWith(invocationCtx);
+			try {
+				var instanceCtx = message.Receiver.InstanceContext;
+				var invocationCtx = new LocalContext (instanceCtx);
+				for (int i = 0, max = Prototype.ParameterNames.Length; i < max; ++i)
+					invocationCtx.SetVariable(Prototype.ParameterNames[i].Name, message.Parameters[i]);
+				
+				return Block.EvaluateWith(invocationCtx);
+			} catch (ReturnException e) {
+				return e.Value;	
+			}
 		}
 	}
 }
