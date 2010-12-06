@@ -40,6 +40,9 @@ namespace Irontalk.Tests {
 		[Test] public void AsInteger()			{ AssertOutput("'32' asInteger",			(long)32);				}
 		[Test] public void WithCRs()			{ AssertOutput("'hello\\world' withCRs",	"hello\nworld"); 		}
 		[Test] public void Concatenation()		{ AssertOutput("'hello ', 'world'",			"hello world"); 		}
+		[Test] public void ConcatCoerceInt()	{ AssertOutput("'hello ', 42",				"hello 42");	 		}
+		[Test] public void ConcatCoerceDouble()	{ AssertOutput("'hello ', 4.2",				"hello 4.2");	 		}
+		[Test] public void ConcatCoerceChar()	{ AssertOutput("'hello ', $w",				"hello w");		 		}
 		[Test] public void Join()				{ AssertOutput("', ' join: #(1 2 3)",	 	"1, 2, 3"); 			}
 		[Test] public void Trim()				{ AssertOutput("'abcabatba' trim: #($a $b)","cabat");	 			}
 		[Test] public void ReplaceWith()		{ AssertOutput("'hi' replace: 'h' with: 'p'","pi"); 				}

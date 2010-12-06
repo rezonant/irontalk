@@ -61,6 +61,14 @@ namespace Irontalk.Tests {
 		}
 		
 		[Test]
+		public void BlockReturn()
+		{
+			var result = compiler.Evaluate("[ ^0. 1 + 2 ] value");
+			Assert.IsNotNull(result);
+			Assert.AreEqual((long)0, result.Native);
+		}
+		
+		[Test]
 		public void BlockLiteralOneUnusedArgumentAndLocals()
 		{
 			var result = compiler.Evaluate("[:foo| |x| 1 + 2 ]");

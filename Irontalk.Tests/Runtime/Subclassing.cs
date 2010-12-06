@@ -22,7 +22,7 @@ namespace Irontalk.Tests
 		[Test]
 		public void SimpleSubclass()
 		{
-			var result = compiler.Evaluate("Irontalk Tests TestSuperclass subclass: #SimpleSubclassA");
+			var result = compiler.Evaluate("Irontalk Tests TestSuperclass subclass: #SimpleSubclass");
 			Assert.IsNotNull(result);
 			Assert.IsInstanceOfType(typeof(STClass), result);
 		}
@@ -30,10 +30,10 @@ namespace Irontalk.Tests
 		[Test]
 		public void SimpleSubclassWithNamespace()
 		{
-			var result = compiler.Evaluate("Irontalk Tests TestSuperclass subclass: #SimpleSubclassB namespace: Irontalk Tests");
+			var result = compiler.Evaluate("Irontalk Tests TestSuperclass subclass: #SimpleSubclassWithNamespace namespace: Irontalk Tests");
 			Assert.IsNotNull(result);
 			Assert.IsInstanceOfType(typeof(STClass), result);
-			var sameResult = compiler.Evaluate("Irontalk Tests SimpleSubclassB");
+			var sameResult = compiler.Evaluate("Irontalk Tests SimpleSubclassWithNamespace");
 			Assert.AreSame(result, sameResult);
 		}
 		
@@ -42,14 +42,34 @@ namespace Irontalk.Tests
 		{
 			Irontalk.Tests.TestSuperclass.Indicator = 42;
 			
-			var result = compiler.Evaluate(
-				"Irontalk Tests TestSuperclass subclass: #SimpleSubclassC namespace: Irontalk Tests with: [ " +
-					"Irontalk Tests TestSuperclass indicator: 42" +
-				" ] ");
+			var result = compiler.Evaluate(@"
+				Irontalk Tests TestSuperclass subclass: #SimpleSubclassWithNamespaceAndBody namespace: Irontalk Tests with: [
+					Irontalk Tests TestSuperclass indicator: 42
+				] 
+			");
 			Assert.IsNotNull(result);
 			Assert.IsInstanceOfType(typeof(STClass), result);
-			var sameResult = compiler.Evaluate("Irontalk Tests SimpleSubclassC");
+			var sameResult = compiler.Evaluate("Irontalk Tests SimpleSubclassWithNamespaceAndBody");
 			Assert.AreSame(result, sameResult);
+		}
+		
+		[Test]
+		public void SimpleSubclassWithAnInstanceMethodThatReturns()
+		{
+			Irontalk.Tests.TestSuperclass.Indicator = 42;
+			
+			var result = compiler.Evaluate(@"
+				Irontalk Tests TestSuperclass 
+					subclass: #SimpleSubclassWithAnInstanceMethodThatReturns namespace: Irontalk Tests 
+					with: [
+						(self define aMethod) with: [ ^1. 0 ].
+					]. 
+				value := Irontalk Tests SimpleSubclassWithAnInstanceMethodThatReturns new aMethod.
+				value = 1 ifTrue: [ ^99 ].
+				^0.
+			");
+			Assert.IsNotNull(result);
+			Assert.AreEqual((long)99, result.Native);
 		}
 	}
 }

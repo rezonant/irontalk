@@ -36,7 +36,7 @@ namespace Irontalk.Tests {
 		{
 			compiler = new Compiler();
 		}
-		
+			
 		protected Compiler compiler;
 		
 		protected void AssertOutput(string input, object output)

@@ -60,6 +60,13 @@ namespace Irontalk.Tests {
 		}
 		
 		[Test]
+		[ExpectedException(typeof(ParseException))]
+		public void RadixLiteralMustHaveNumber()
+		{
+			compiler.Evaluate("10r");
+		}
+		
+		[Test]
 		public void DecimalRadixNegative()
 		{
 			var result = compiler.Evaluate("10r-5");
@@ -83,7 +90,7 @@ namespace Irontalk.Tests {
 			var result = compiler.Evaluate("-10r-10");
 			Assert.IsNotNull(result);
 			Assert.That(result.Class == STClass.GetForCLR(typeof(long), "Integer"));
-			Assert.That(result.Native.Equals((long)-10));
+			Assert.AreEqual((long)10, result.Native);
 		}
 		
 		[Test]

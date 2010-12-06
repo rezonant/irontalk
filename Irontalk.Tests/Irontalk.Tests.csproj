@@ -54,6 +54,8 @@
     <Compile Include="Runtime\Integers.cs" />
     <Compile Include="Runtime\Strings.cs" />
     <Compile Include="Runtime\Exceptions.cs" />
+    <Compile Include="Runtime\Classes.cs" />
+    <Compile Include="Doubles.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Irontalk\Irontalk.csproj">
