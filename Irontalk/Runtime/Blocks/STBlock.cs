@@ -166,8 +166,10 @@ namespace Irontalk
 			if (Sequence[i].Name == "var_def") 
 				i += 1;
 			
-			for (int max = Sequence.Count; i < max; ++i)
+			for (int max = Sequence.Count; i < max; ++i) {
+				if (Sequence[i].Name == "DOT") continue;
 				visitor.VisitStatement(Sequence[i]);
+			}
 		}
 	}
 }
