@@ -43,7 +43,7 @@ namespace Test
 	
 	class MainClass
 	{
-		public static void TestInput (Compiler interp, string input, Context ctx)
+		public static void Evaluate (Compiler interp, string input, Context ctx)
 		{
 			input = input.Trim(' ', '\n', '\t');
 			if (input == "") return;
@@ -74,9 +74,7 @@ namespace Test
 		{
 			var interp = new Compiler(Assembly.GetCallingAssembly());
 			var ctx = new LocalContext(GlobalContext.Instance);
-			/*/
-			TestInput (interp, "2");
-			/*/
+			
 			while (true) {
 				string input = ReadLine.readline("ist: ");
 				
@@ -89,12 +87,15 @@ namespace Test
 					break;
 				
 				try {
-					TestInput (interp, input, ctx);
+					Evaluate (interp, input, ctx);
+				} catch (ParseException e) {
+					Console.WriteLine ("Parse error: " + e.Message);
+				} catch (CompileException e) {
+					Console.WriteLine ("Error compiling: " + e.Message);
 				} catch (Exception e) {
 					Console.WriteLine ("Unhandled exception: " + e);
 				}
 			}
-			//*/
 		}
 	}
 }
