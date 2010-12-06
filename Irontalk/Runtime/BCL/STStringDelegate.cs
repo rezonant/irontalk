@@ -146,7 +146,6 @@ namespace Irontalk {
 		{ 
 			return self.IndexOf(substr) + 1;
 		}
-		
 		[STRuntimeMethod("findFirst:")] public static long FindFirst(string self, STBlock aBlock) 
 		{ 
 			long index = 0;
@@ -161,7 +160,14 @@ namespace Irontalk {
 			return 0;
 		}
 		
-		[STRuntimeMethod("findString:startingAt:")] public static long FindStringStartingAt(string self, string substr, long at) 
+		[STRuntimeMethod("findString:startingAt:caseSensitive:")] 
+		public static long FindString(string self, string substr, long at, bool caseSensitive)
+		{
+			return self.IndexOf(substr, (int)at, (int)(self.Length - at - 1), 
+				caseSensitive? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase) + 1;
+		}
+		
+		[STRuntimeMethod("findString:startingAt:")] public static long FindString(string self, string substr, long at) 
 		{
 			return self.IndexOf(substr, (int)at) + 1;
 		}
@@ -186,9 +192,9 @@ namespace Irontalk {
 			return self.Trim(chars.NativeArray().Cast<char>());
 		}
 		
-		[STRuntimeMethod(",")] public static string Concatenate(string self, string other) 
+		[STRuntimeMethod(",")] public static string Concatenate(string self, STObject other) 
 		{ 
-			return self + other; 
+			return self + other.ToString(); 
 		}
 		
 		[STRuntimeMethod(">")] public static bool Gt(string self, string other) { 

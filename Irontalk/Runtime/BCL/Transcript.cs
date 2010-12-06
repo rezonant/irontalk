@@ -27,16 +27,22 @@ namespace Irontalk
 	public class Transcript : STRuntimeObject {
 		public Transcript(TextWriter output)
 		{
-			Out = Console.Out;
+			Out = output;
 		}
 		
 		public TextWriter Out { get; set; }
 		
 		[STRuntimeMethod("show:")]
-		public STObject Show(object value)
+		public void Show(object value)
 		{
 			Out.Write(value);
-			return STClass.GetForCLR(typeof(Transcript), "Transcript");
+		}
+		
+		[STRuntimeMethod("showLine:")]
+		public void ShowLine(object value)
+		{
+			Show (value);
+			Show ("\n");
 		}
 		
 		public static Transcript Instance {
@@ -47,12 +53,12 @@ namespace Irontalk
 		
 		public static void WriteLine(string format, params object[] args)
 		{
-			var tr = GlobalContext.Instance.GetVariable("Transcript").Native as Transcript;
+			var instance = Instance;
 			
-			if (tr == null)
+			if (instance == null)
 				Console.WriteLine (format, args);
 			
-			tr.Show(string.Format(format + "\n", args));
+			instance.Show(string.Format(format + "\n", args));
 		}
 	}
 }
