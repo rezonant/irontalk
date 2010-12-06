@@ -57,6 +57,12 @@ namespace Irontalk {
 			}
 		}
 		
+		[STRuntimeMethod("methodDict")]
+		public MethodDictionary MethodDict()
+		{
+			return MethodDictionary;
+		}
+		
 		public string Plural {
 			get {
 				if (Name.EndsWith("s"))
@@ -84,11 +90,10 @@ namespace Irontalk {
 			}
 		}
 		
-		protected Dictionary<STSymbol, STCompiledMethod> methodDictionary = 
-			new Dictionary<STSymbol, STCompiledMethod>();
+		protected MethodDictionary methodDictionary = new MethodDictionary();
 		protected string[] ivarNames = new string[0];
 		
-		public Dictionary<STSymbol, STCompiledMethod> MethodDictionary { get { return methodDictionary; } }
+		public MethodDictionary MethodDictionary { get { return methodDictionary; } }
 		public virtual STClassDescription Superclass { get { return null; } }
 		public virtual string Name { get; protected set; }
 		
