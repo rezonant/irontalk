@@ -94,11 +94,10 @@ namespace Irontalk
 			} catch (MessageNotUnderstood e) {
 				if (message.Name == "doesNotUnderstand:")
 					throw e;	// avoid infinite recursion
-				Console.WriteLine ("!! " + e.Message);
 				return Send (STSymbol.Get("doesNotUnderstand:"), msg);
 			}
 		}
-		
+			
 		public virtual STObject HandleDoesNotUnderstand(STMessage msg)
 		{
 			throw new MessageNotUnderstood(msg);
