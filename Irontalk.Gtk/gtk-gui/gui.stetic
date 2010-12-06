@@ -73,6 +73,14 @@
         <property name="Active">False</property>
         <signal name="Activated" handler="TogglePrintInput" />
       </action>
+      <action id="TimeEachCommandAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Time each command</property>
+        <property name="ShortLabel" translatable="yes">Time each command</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <signal name="Activated" handler="OnTimeEachCommandActionToggled" />
+      </action>
     </action-group>
     <property name="MemberName" />
     <property name="Title" translatable="yes">Irontalk</property>
@@ -82,7 +90,7 @@
       <widget class="Gtk.VPaned" id="vpaned1">
         <property name="MemberName" />
         <property name="CanFocus">True</property>
-        <property name="Position">195</property>
+        <property name="Position">189</property>
         <child>
           <widget class="Gtk.VBox" id="vbox1">
             <property name="MemberName" />
@@ -98,6 +106,7 @@
                     <node type="Menuitem" action="WordWrapAction" />
                     <node type="Menuitem" action="ShowParseTreeBeforeEvaluatingAction" />
                     <node type="Menuitem" action="PrintInputBeforeEvaluatingAction" />
+                    <node type="Menuitem" action="TimeEachCommandAction" />
                   </node>
                   <node type="Menu" action="ModeAction">
                     <node type="Menuitem" action="EvaluateAction" />
@@ -113,7 +122,7 @@
               </packing>
             </child>
             <child>
-              <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+              <widget class="Gtk.ScrolledWindow" id="outputScroller">
                 <property name="MemberName" />
                 <property name="ShadowType">In</property>
                 <child>

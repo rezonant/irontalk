@@ -23,13 +23,15 @@ public partial class MainWindow
 
 	private global::Gtk.ToggleAction PrintInputBeforeEvaluatingAction;
 
+	private global::Gtk.ToggleAction TimeEachCommandAction;
+
 	private global::Gtk.VPaned vpaned1;
 
 	private global::Gtk.VBox vbox1;
 
 	private global::Gtk.MenuBar menubar1;
 
-	private global::Gtk.ScrolledWindow GtkScrolledWindow;
+	private global::Gtk.ScrolledWindow outputScroller;
 
 	private global::Gtk.TextView output;
 
@@ -90,6 +92,9 @@ public partial class MainWindow
 		this.PrintInputBeforeEvaluatingAction = new global::Gtk.ToggleAction ("PrintInputBeforeEvaluatingAction", global::Mono.Unix.Catalog.GetString ("Print input before evaluating"), null, null);
 		this.PrintInputBeforeEvaluatingAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Print input before evaluating");
 		w1.Add (this.PrintInputBeforeEvaluatingAction, null);
+		this.TimeEachCommandAction = new global::Gtk.ToggleAction ("TimeEachCommandAction", global::Mono.Unix.Catalog.GetString ("Time each command"), null, null);
+		this.TimeEachCommandAction.ShortLabel = global::Mono.Unix.Catalog.GetString ("Time each command");
+		w1.Add (this.TimeEachCommandAction, null);
 		this.UIManager.InsertActionGroup (w1, 0);
 		this.AddAccelGroup (this.UIManager.AccelGroup);
 		this.Name = "MainWindow";
@@ -99,13 +104,13 @@ public partial class MainWindow
 		this.vpaned1 = new global::Gtk.VPaned ();
 		this.vpaned1.CanFocus = true;
 		this.vpaned1.Name = "vpaned1";
-		this.vpaned1.Position = 195;
+		this.vpaned1.Position = 189;
 		// Container child vpaned1.Gtk.Paned+PanedChild
 		this.vbox1 = new global::Gtk.VBox ();
 		this.vbox1.Name = "vbox1";
 		this.vbox1.Spacing = 6;
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='stopAction' action='stopAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='WordWrapAction' action='WordWrapAction'/><menuitem name='ShowParseTreeBeforeEvaluatingAction' action='ShowParseTreeBeforeEvaluatingAction'/><menuitem name='PrintInputBeforeEvaluatingAction' action='PrintInputBeforeEvaluatingAction'/></menu><menu name='ModeAction' action='ModeAction'><menuitem name='EvaluateAction' action='EvaluateAction'/><menuitem name='ParseOnlyAction' action='ParseOnlyAction'/></menu></menubar></ui>");
+		this.UIManager.AddUiFromString ("<ui><menubar name='menubar1'><menu name='FileAction' action='FileAction'><menuitem name='stopAction' action='stopAction'/></menu><menu name='OptionsAction' action='OptionsAction'><menuitem name='WordWrapAction' action='WordWrapAction'/><menuitem name='ShowParseTreeBeforeEvaluatingAction' action='ShowParseTreeBeforeEvaluatingAction'/><menuitem name='PrintInputBeforeEvaluatingAction' action='PrintInputBeforeEvaluatingAction'/><menuitem name='TimeEachCommandAction' action='TimeEachCommandAction'/></menu><menu name='ModeAction' action='ModeAction'><menuitem name='EvaluateAction' action='EvaluateAction'/><menuitem name='ParseOnlyAction' action='ParseOnlyAction'/></menu></menubar></ui>");
 		this.menubar1 = ((global::Gtk.MenuBar)(this.UIManager.GetWidget ("/menubar1")));
 		this.menubar1.Name = "menubar1";
 		this.vbox1.Add (this.menubar1);
@@ -114,19 +119,19 @@ public partial class MainWindow
 		w2.Expand = false;
 		w2.Fill = false;
 		// Container child vbox1.Gtk.Box+BoxChild
-		this.GtkScrolledWindow = new global::Gtk.ScrolledWindow ();
-		this.GtkScrolledWindow.Name = "GtkScrolledWindow";
-		this.GtkScrolledWindow.ShadowType = ((global::Gtk.ShadowType)(1));
-		// Container child GtkScrolledWindow.Gtk.Container+ContainerChild
+		this.outputScroller = new global::Gtk.ScrolledWindow ();
+		this.outputScroller.Name = "outputScroller";
+		this.outputScroller.ShadowType = ((global::Gtk.ShadowType)(1));
+		// Container child outputScroller.Gtk.Container+ContainerChild
 		this.output = new global::Gtk.TextView ();
 		this.output.Buffer.Text = "Welcome to Irontalk.\n© 2010 William Lahti. This software is licensed under the GNU General Public License version 3.0 or later. For details type:\n\n\tSmalltalk license\n\n";
 		this.output.CanFocus = true;
 		this.output.Name = "output";
 		this.output.Editable = false;
 		this.output.CursorVisible = false;
-		this.GtkScrolledWindow.Add (this.output);
-		this.vbox1.Add (this.GtkScrolledWindow);
-		global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.GtkScrolledWindow]));
+		this.outputScroller.Add (this.output);
+		this.vbox1.Add (this.outputScroller);
+		global::Gtk.Box.BoxChild w4 = ((global::Gtk.Box.BoxChild)(this.vbox1[this.outputScroller]));
 		w4.Position = 1;
 		this.vpaned1.Add (this.vbox1);
 		global::Gtk.Paned.PanedChild w5 = ((global::Gtk.Paned.PanedChild)(this.vpaned1[this.vbox1]));
@@ -229,6 +234,7 @@ public partial class MainWindow
 		this.WordWrapAction.Activated += new global::System.EventHandler (this.ToggleWordWrap);
 		this.ShowParseTreeBeforeEvaluatingAction.Activated += new global::System.EventHandler (this.ToggleShowParseTree);
 		this.PrintInputBeforeEvaluatingAction.Activated += new global::System.EventHandler (this.TogglePrintInput);
+		this.TimeEachCommandAction.Activated += new global::System.EventHandler (this.OnTimeEachCommandActionToggled);
 		this.input.Activated += new global::System.EventHandler (this.InputEnter);
 		this.eval.Clicked += new global::System.EventHandler (this.EvalActivated);
 		this.evalMulti.Clicked += new global::System.EventHandler (this.MultiInputActivated);

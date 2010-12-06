@@ -66,15 +66,21 @@ public partial class MainWindow : Gtk.Window {
 	Context context;
 	bool showParseTrees = false;
 	bool printInput = true;
+	bool timeCommand = false;
 	
 	public void Write(string val)
 	{
 		var iter = output.Buffer.EndIter;
 		output.Buffer.Insert(ref iter, val);
-		output.Buffer.PlaceCursor(output.Buffer.EndIter);
-		output.ScrollToIter(output.Buffer.EndIter, 0, false, 0, 0);
+		output.Buffer = output.Buffer;
+		
+		GLib.Timeout.Add(30, delegate()
+			{
+				output.ScrollToIter(output.Buffer.EndIter, 0, false, 0, 0);
+				return false;
+			});
 	}
-	
+
 	protected void OnDeleteEvent (object sender, DeleteEventArgs a)
 	{
 		Application.Quit ();
@@ -87,13 +93,22 @@ public partial class MainWindow : Gtk.Window {
 		string val = "null";
 		
 		STDebug.ShowParseTrees = showParseTrees;
-		
+		DateTime start = DateTime.Now, end;
+	
 		try {
 			obj = compiler.Evaluate(source, context);
+			
 			if (obj != null)
 				val = " => " + obj.Send(STSymbol.Get("asString")).Native.ToString();
+			
 		} catch (Exception ex) {
 			val = " x> " + ex;
+		}
+		
+		end = DateTime.Now;
+		
+		if (timeCommand) {
+			Write(string.Format("Elapsed: {0}\n", (start - end)));
 		}
 		
 		if (printInput)
@@ -133,6 +148,12 @@ public partial class MainWindow : Gtk.Window {
 	{
 		printInput = !printInput;
 	}
+	
+	protected virtual void OnTimeEachCommandActionToggled (object sender, System.EventArgs e)
+	{
+		timeCommand = !timeCommand;
+	}
+	
 	
 	
 	
